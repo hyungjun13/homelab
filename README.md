@@ -12,6 +12,14 @@ Infrastructure-as-code for my home server. Every service runs as a Docker Compos
 | Storage | 2× 6 TB WD in a ZFS mirror (`tank`) |
 | Router | TP-Link Archer A7 running OpenWrt |
 
+## Build notes
+
+The first build didn't go smoothly.
+
+**Used parts from eBay.** To keep costs down, I started with used parts off eBay, including an obscure motherboard that was cheap for a reason. The machine froze partway through the Ubuntu install, and after some troubleshooting it was clear the parts were faulty. I ended up swapping out both the CPU and the motherboard, which is how it landed on the i3-14100. The lesson was that a cheap, obscure board isn't a bargain if it won't boot an installer.
+
+**The drives.** I bought the two 6 TB WD drives around the start of 2026, before AI datacenter demand drove hard drive prices up. That turned out to be the best-timed purchase of the build.
+
 ## Architecture
 
 ```mermaid
