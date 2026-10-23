@@ -4,12 +4,17 @@ Infrastructure-as-code for my home server. Every service runs as a Docker Compos
 
 ## Hardware
 
-| Component | Details |
+`homeserver` runs Ubuntu Server 26.04 LTS on bare metal, headless over SSH. Full part list on [PCPartPicker](https://pcpartpicker.com/list/JTcdGk).
+
+| Component | Part |
 |---|---|
-| Host | `homeserver` — Intel Core i3-14100 (4C/8T, UHD 730 iGPU with QuickSync) |
-| OS | Ubuntu Server 26.04 LTS, bare metal, headless |
-| Boot | 128 GB NVMe |
-| Storage | 2× 6 TB WD in a ZFS mirror (`tank`) |
+| CPU | Intel Core i3-14100 (4C/8T, UHD 730 iGPU with QuickSync) |
+| Motherboard | ASUS PRIME H610I-PLUS D4 (Mini-ITX, LGA1700) |
+| Memory | Silicon Power 16 GB (2× 8 GB) DDR4-3200 CL16 |
+| Boot drive | Patriot P300 128 GB NVMe |
+| Data drives | 2× WD Red Plus 6 TB (5400 RPM, CMR) in a ZFS mirror (`tank`) |
+| Case | Fractal Design Node 304 (Mini-ITX) |
+| Power supply | SAMA G650 650 W 80+ Gold, fully modular |
 | Router | TP-Link Archer A7 running OpenWrt |
 
 ## Build notes
