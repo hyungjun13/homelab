@@ -20,7 +20,7 @@ flowchart LR
         phone[Phone / laptop]
     end
     subgraph Home network
-        router[OpenWrt router<br/>VLANs · adblock-lean]
+        router[OpenWrt router<br/>VLANs · Tailscale]
         subgraph homeserver
             pihole[Pi-hole<br/>DNS]
             npm[Nginx Proxy Manager]
@@ -40,9 +40,9 @@ flowchart LR
     apps --- zfs
 ```
 
-- **Remote access** is Tailscale only. Nothing is port-forwarded to the internet.
-- **DNS:** Pi-hole resolves `*.homeserver.lan` to the server; Nginx Proxy Manager routes each name to its container (e.g. `home.homeserver.lan` → Homarr, `kuma.homeserver.lan` → Uptime Kuma).
-- **Network:** the server has a static DHCP lease on OpenWrt, which also handles VLAN segmentation and router-level ad blocking.
+- **Remote access** is Tailscale only. Nothing is port-forwarded to the internet. Tailscale split DNS sends `homeserver.lan` lookups to Pi-hole, so the same hostnames work away from home.
+- **DNS:** Pi-hole is the LAN's DNS server and ad blocker. It resolves `*.homeserver.lan` to the server; Nginx Proxy Manager routes each name to its container (e.g. `home.homeserver.lan` → Homarr, `kuma.homeserver.lan` → Uptime Kuma).
+- **Network:** the server has a static DHCP lease on OpenWrt, which also handles VLAN segmentation.
 
 ## Deployment workflow
 
@@ -86,7 +86,7 @@ Each stack folder holds its compose file and a `.env.example` listing the variab
 | [Arcane](https://github.com/ofkm/arcane) | Stack manager, deploys from this repo |
 | [Nginx Proxy Manager](https://nginxproxymanager.com/) | Reverse proxy for `*.homeserver.lan` |
 | [Pi-hole](https://pi-hole.net/) | Network DNS and ad blocking |
-| [Uptime Kuma](https://github.com/louislam/uptime-kuma) | Monitoring: services, DNS, internet, router, disk space, ZFS health |
+| [Uptime Kuma](https://github.com/louislam/uptime-kuma) | Monitoring and alerts (Discord) |
 | [Homarr](https://homarr.dev/) | Dashboard |
 
 ### Planned
@@ -99,7 +99,18 @@ Each stack folder holds its compose file and a `.env.example` listing the variab
 | Navidrome | Music streaming |
 | Actual Budget, Ghostfolio | Budgeting and investment tracking |
 | Prometheus + Grafana | Metrics and dashboards |
-| ntfy | Alerts |
+
+## Monitoring
+
+Uptime Kuma watches the stack and the network, and sends alerts to Discord. Homarr shows its status on the dashboard.
+
+| Monitor | What it checks |
+|---|---|
+| Arcane, npm, Pi Hole | The core services are up |
+| Pi Hole DNS, Cloudflare DNS | Local and upstream DNS resolve |
+| Internet, Router | The WAN link and OpenWrt router |
+| Disk Space | Free space on the server |
+| ZFS health | The `tank` pool is healthy |
 
 ## Storage
 
@@ -113,7 +124,7 @@ All persistent data lives on the ZFS mirror, one dataset per kind of data, so sn
 | `tank/photos` | Photo library |
 | `tank/files` | Documents |
 
-The mirror protects against a dead drive. Snapshots (sanoid) and offsite backups (restic to cloud storage) are on the roadmap.
+The mirror protects against a dead drive. [Sanoid](https://github.com/jimsalterjrs/sanoid) takes local snapshots on a schedule. Offsite backups will go to Backblaze B2 and be taken from ZFS snapshots, not live files, so each backup is a consistent point in time.
 
 ## Setting up a stack
 
@@ -125,10 +136,11 @@ Then add the stack in Arcane, pointing at its folder in this repo.
 
 ## Roadmap
 
-- [ ] Migrate all app data from the boot drive to `tank/appdata`
-- [ ] ZFS snapshots with sanoid
-- [ ] Offsite backups with restic
-- [ ] ntfy for alerts
+- [x] Migrate all app data from the boot drive to `tank/appdata`
+- [x] Pin image tags and let Renovate handle updates
+- [x] ZFS snapshots with sanoid
+- [x] Uptime Kuma alerts to Discord
+- [ ] Offsite backups to Backblaze B2 from ZFS snapshots
 - [ ] Immich and Paperless-ngx
 - [ ] Media stack
 - [ ] Finance tools
