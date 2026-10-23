@@ -10,5 +10,5 @@ services:
     environment:
       TZ: "America/Chicago"
     volumes:
-      - ./data:/data
-      - ./letsencrypt:/etc/letsencrypt
+      - /tank/appdata/npm/data:/data
+      - /tank/appdata/npm/letsencrypt:/etc/letsencrypt
