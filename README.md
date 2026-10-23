@@ -12,7 +12,7 @@ Infrastructure-as-code for my home server. Every service runs as a Docker Compos
 | Motherboard | ASUS PRIME H610I-PLUS D4 (Mini-ITX, LGA1700) |
 | Memory | Silicon Power 16 GB (2× 8 GB) DDR4-3200 CL16 |
 | Boot drive | Patriot P300 128 GB NVMe |
-| Data drives | 2× WD Red Plus 6 TB (5400 RPM, CMR) in a ZFS mirror (`tank`) |
+| Data drives | 2× WD Red Plus 6 TB (5400 RPM, CMR) in ZFS RAIDZ1 (`tank`) |
 | Case | Fractal Design Node 304 (Mini-ITX) |
 | Power supply | SAMA G650 650 W 80+ Gold, fully modular |
 | Router | TP-Link Archer A7 running OpenWrt |
@@ -39,7 +39,7 @@ flowchart LR
             npm[Nginx Proxy Manager]
             apps[Homarr · Uptime Kuma · ...]
             arcane[Arcane]
-            zfs[(ZFS mirror<br/>tank)]
+            zfs[(ZFS RAIDZ1<br/>tank)]
         end
     end
     gh[GitHub<br/>this repo]
@@ -133,7 +133,7 @@ Uptime Kuma watches the stack and the network, and sends alerts to Discord. Homa
 
 ## Storage
 
-All persistent data lives on the ZFS mirror, one dataset per kind of data, so snapshots and backups can be scoped independently:
+All persistent data lives on the ZFS pool `tank`, one dataset per kind of data, so snapshots and backups can be scoped independently:
 
 | Dataset | Contents |
 |---|---|
@@ -143,7 +143,9 @@ All persistent data lives on the ZFS mirror, one dataset per kind of data, so sn
 | `tank/photos` | Photo library |
 | `tank/files` | Documents |
 
-The mirror protects against a dead drive. [Sanoid](https://github.com/jimsalterjrs/sanoid) snapshots every dataset in `tank` and keeps 24 hourly, 30 daily and 6 monthly snapshots ([config](host/sanoid/sanoid.conf)). Those are the first stop for undoing a mistake.
+`tank` is a RAIDZ1 pool, so it survives one dead drive. It started as a 2-drive mirror and was rebuilt as RAIDZ1 in October 2026 while still nearly empty, so it can grow one drive at a time with RAIDZ expansion (`zpool attach tank raidz1-0 <disk>`, then `zfs rewrite` to rebalance existing data). New drives should be 6 TB or larger CMR drives; ZFS counts every drive as the size of the smallest.
+
+[Sanoid](https://github.com/jimsalterjrs/sanoid) snapshots every dataset in `tank` and keeps 24 hourly, 30 daily and 6 monthly snapshots ([config](host/sanoid/sanoid.conf)). Those are the first stop for undoing a mistake.
 
 ### Offsite backup
 
