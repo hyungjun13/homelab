@@ -85,10 +85,14 @@ stacks/
 ├── npm/
 ├── pihole/
 └── uptime-kuma/
+host/
+└── restic/        nightly offsite backup (script, systemd units, installer)
 renovate.json
 ```
 
 Each stack folder holds its compose file and a `.env.example` listing the variables it needs. Real `.env` files live only on the server and are never committed.
+
+`host/` holds jobs that run on the host instead of in Docker, because they need direct access to ZFS. Arcane doesn't deploy these; each folder has an `install.sh` to run after `git pull`.
 
 ## Services
 
@@ -137,7 +141,18 @@ All persistent data lives on the ZFS mirror, one dataset per kind of data, so sn
 | `tank/photos` | Photo library |
 | `tank/files` | Documents |
 
-The mirror protects against a dead drive. [Sanoid](https://github.com/jimsalterjrs/sanoid) takes local snapshots on a schedule. Offsite backups will go to Backblaze B2 and be taken from ZFS snapshots, not live files, so each backup is a consistent point in time.
+The mirror protects against a dead drive. [Sanoid](https://github.com/jimsalterjrs/sanoid) takes local snapshots on a schedule.
+
+### Offsite backup
+
+Every night at 3 AM, [`host/restic`](host/restic) backs everything up to Backblaze B2 with [restic](https://restic.net/):
+
+1. Take a recursive snapshot `tank@restic`, so every dataset (and every app database) is captured at the same instant.
+2. Mount each dataset's snapshot read-only under `/mnt/backup`.
+3. Upload it, plus `/opt/stacks` for the `.env` files, encrypted. Keep 7 daily, 4 weekly and 6 monthly versions.
+4. Unmount and destroy the snapshot, then ping an Uptime Kuma Push monitor. No ping for 25 hours means an alert.
+
+Secrets live in `/etc/restic/env` (see [`env.example`](host/restic/env.example)) and `/etc/restic/password`, both outside the repo, with copies in my password manager.
 
 ## Setting up a stack
 
