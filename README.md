@@ -86,7 +86,8 @@ stacks/
 ├── pihole/
 └── uptime-kuma/
 host/
-└── restic/        nightly offsite backup (script, systemd units, installer)
+├── restic/        nightly offsite backup (script, systemd units, installer)
+└── sanoid/        local ZFS snapshot policy
 renovate.json
 ```
 
@@ -141,7 +142,7 @@ All persistent data lives on the ZFS mirror, one dataset per kind of data, so sn
 | `tank/photos` | Photo library |
 | `tank/files` | Documents |
 
-The mirror protects against a dead drive. [Sanoid](https://github.com/jimsalterjrs/sanoid) takes local snapshots on a schedule.
+The mirror protects against a dead drive. [Sanoid](https://github.com/jimsalterjrs/sanoid) snapshots every dataset in `tank` and keeps 24 hourly, 30 daily and 6 monthly snapshots ([config](host/sanoid/sanoid.conf)). Those are the first stop for undoing a mistake.
 
 ### Offsite backup
 
