@@ -5,5 +5,5 @@ services:
     ports:
       - "3001:3001"
     volumes:
-      - ./data:/app/data
+      - /tank/appdata/uptime-kuma/data:/app/data
     restart: unless-stopped
