@@ -129,6 +129,7 @@ Uptime Kuma watches the stack and the network, and sends alerts to Discord. Homa
 | Internet, Router | The WAN link and OpenWrt router |
 | Disk Space | Free space on the server |
 | ZFS health | The `tank` pool is healthy |
+| Restic backup | Push monitor: the nightly offsite backup succeeded in the last 25 hours |
 
 ## Storage
 
@@ -169,7 +170,7 @@ Then add the stack in Arcane, pointing at its folder in this repo.
 - [x] Pin image tags and let Renovate handle updates
 - [x] ZFS snapshots with sanoid
 - [x] Uptime Kuma alerts to Discord
-- [ ] Offsite backups to Backblaze B2 from ZFS snapshots
+- [x] Offsite backups to Backblaze B2 from ZFS snapshots
 - [ ] Immich and Paperless-ngx
 - [ ] Media stack
 - [ ] Finance tools
