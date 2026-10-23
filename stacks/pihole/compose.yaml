@@ -13,6 +13,6 @@ services:
       FTLCONF_dns_listeningMode: all
       FTLCONF_misc_dnsmasq_lines: address=/homeserver.lan/192.168.1.152
     volumes:
-      - ./etc-pihole:/etc/pihole
+      - /tank/appdata/pihole/etc-pihole:/etc/pihole
     restart: unless-stopped
 networks: {}
